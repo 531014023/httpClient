@@ -36,8 +36,8 @@ HttpClient::instance()->send('https:://www.baidu.com');
 //post
 HttpClient::instance()->setPostData(array())->send('url','POST);
 //post请求结果解析为json/array
-HttpClient::instance()->setPostData(array())->send('url','POST);
-HttpClient::instance()->setPostData(array())->send('url','POST);
+HttpClient::instance()->setPostData(array())->send('url','POST)->parseJson()->getBody();
+HttpClient::instance()->setPostData(array())->send('url','POST)->parseArray()->getBody();
 //post json数据
 HttpClient::instance()->setPostData(array(),true)->send('url','POST);
 //获取错误结果
