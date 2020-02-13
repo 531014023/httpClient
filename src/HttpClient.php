@@ -112,19 +112,18 @@ class HttpClient{
             if (is_string($postData)) {
                 $post_str = urlencode($postData);
             }
-            $this->header = array(
+            $this->setHeader(array(
                 'Content-Type: application/x-www-form-urlencoded',
-                'Content-Length: ' . strlen($post_str),
-                'X-Requested-With: XMLHttpRequest'
-            );
+                'Content-Length: ' . strlen($post_str)
+            ));
         }else{
             $post_str = json_encode($postData);
-            $this->header = array(
+            $this->setHeader(array(
                 'Content-Type: application/json',
-                'Content-Length: ' . strlen($post_str),
-                'X-Requested-With: XMLHttpRequest'
-            );
+                'Content-Length: ' . strlen($post_str)
+            ));
         }
+        $this->setAjax();
         $this->postData = $post_str;
         return $this;
     }
@@ -141,7 +140,23 @@ class HttpClient{
         return $this;
     }
     public function setHeader($header){
-        $this->header = $header;
+        if(empty($this->header)) {
+            $this->header = $header;
+        }else{
+            $this->header = array_merge($this->header,$header);
+        }
+        return $this;
+    }
+    public function setAjax(){
+        if(empty($this->header)){
+            $this->header = [
+                'X-Requested-With: XMLHttpRequest'
+            ];
+        }else{
+            if($key = array_search('X-Requested-With: XMLHttpRequest',$this->header) === false){
+                $this->header[] = 'X-Requested-With: XMLHttpRequest';
+            }
+        }
         return $this;
     }
     /**
@@ -155,12 +170,16 @@ class HttpClient{
                 'Content-Type: '.$con_type
             ];
         }else{
-            $this->header = array_map(function ($item)use ($con_type){
-                if(strpos($item,'Content-Type:') !== false){
-                    return 'Content-Type: '.$con_type;
+            $is_content_type = false;
+            foreach ($this->header as $k=>$header){
+                if(strpos($header,'Content-Type:') !== false){
+                    $this->header[$k] = 'Content-Type: '.$con_type;
+                    $is_content_type = true;
                 }
-                return $item;
-            },$this->header);
+            }
+            if(!$is_content_type){
+                $this->header[] = 'Content-Type: '.$con_type;
+            }
         }
         return $this;
     }
@@ -171,12 +190,16 @@ class HttpClient{
                 'User-Agent: '.$user_agent
             ];
         }else{
-            $this->header = array_map(function ($item)use ($user_agent){
-                if(strpos($item,'User-Agent:') !== false){
-                    return 'User-Agent: '.$user_agent;
+            $is_ua = false;
+            foreach ($this->header as $k=>$header){
+                if(strpos($header,'Content-Type:') !== false){
+                    $this->header[$k] = 'Content-Type: '.$user_agent;
+                    $is_ua = true;
                 }
-                return $item;
-            },$this->header);
+            }
+            if(!$is_ua){
+                $this->header[] = 'Content-Type: '.$user_agent;
+            }
         }
         return $this;
     }
