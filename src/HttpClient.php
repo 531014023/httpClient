@@ -37,7 +37,9 @@ class HttpClient{
         'xml'=>'application/xml'
     ];
 
-    private function __construct(){}
+    private function __construct(){
+
+    }
 
     /**
      * @param mixed $ssl
