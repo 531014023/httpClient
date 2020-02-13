@@ -18,7 +18,7 @@ print_r($response->getBody());
 print_r($response->parseJson->getBody());
 print_r($response->parseArray->getBody());
 //post json数据
-HttpClient::postJson("http://qzshop.93dd.top/test",['code'=>1,'data'=>'test']);
+HttpClient::postJson("http://www.baidu.com",['code'=>1,'data'=>'test']);
 //获取错误结果
 print_r($response->getError());
 print_r($response->getErrno());
@@ -27,7 +27,17 @@ print_r($response->getHeader());
 //使用代理
 HttpClient::instance()->setProxy('ip:port')->send('https:://www.baidu.com');
 //上传文件
-HttpClient::postFile("http://qzshop.93dd.top/test",['code'=>1,'file'=>'/usr/local/test.png']);
+HttpClient::postFile("http://www.baidu.com",['code'=>1,'file'=>'/usr/local/test.png']);
+//使用session
+$session = HttpClient::session();
+$response = $session::post("http://www.baidu.com",[
+    'username'=>'username',
+    'password'=>'password'
+]);
+echo "header: ";
+print_r($response->getHeader());
+echo "body: ";
+print_r($response->getBody());
 ```
 ## 完整使用
 ```php
