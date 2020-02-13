@@ -19,7 +19,7 @@ class HttpClient{
     private $ssl = false;
     private $showHead = false;
     private $follow = true;
-    private $response;
+    private $body;
     private $userAgent = [
         'web'=>[
             'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36'
@@ -185,7 +185,7 @@ class HttpClient{
     /**
      * @param null $url
      * @param null $method
-     * @return HttpClient
+     * @return Response
      * @throws Exception
      */
     public function send($url = null, $method = null){
@@ -233,40 +233,83 @@ class HttpClient{
         if($this->header) {
             curl_setopt($this->ch, CURLOPT_HTTPHEADER, $this->header);
         }
-        $this->response = curl_exec($this->ch);
-        return $this;
+        $this->body = curl_exec($this->ch);
+        return $this->response();
     }
-    public function parseToJson(){
-        $this->response = json_decode($this->response);
-        return $this;
+    /**
+     * @param $url
+     * @param array $header
+     * @return HttpClient|Response
+     */
+    public static function get($url,$header = []){
+        self::$instance = new static();
+        if($header){
+            self::$instance->setHeader($header);
+        }
+        return self::$instance->setUrl($url)->send();
     }
-    public function parseToArray(){
-        $this->response = json_decode($this->response,true);
-        return $this;
+    /**
+     * @param $url
+     * @param array $data
+     * @param array $header
+     * @return HttpClient|Response
+     */
+    public static function post($url,$data = [],$header = []){
+        self::$instance = new static();
+        if($header){
+            self::$instance->setHeader($header);
+        }
+        if($data){
+            self::$instance->setPostData($data);
+        }
+        return self::$instance->setMethod('POST')->setUrl($url)->send();
+    }
+    /**
+     * @param $url
+     * @param array $data
+     * @param array $header
+     * @return HttpClient|Response
+     */
+    public static function postJson($url,$data = [],$header = []){
+        self::$instance = new static();
+        if($header){
+            self::$instance->setHeader($header);
+        }
+        if($data){
+            self::$instance->setPostData($data,true);
+        }
+        return self::$instance->setMethod('POST')->setUrl($url)->send();
+    }
+    /**
+     * @param $url
+     * @param $file_data
+     * @param array $header
+     * @return HttpClient|Response
+     */
+    public static function postFile($url,$file_data,$header = []){
+        self::$instance = new static();
+        if($header){
+            self::$instance->setHeader($header);
+        }
+        $file_data = array_map(function ($file_path){
+            if(!is_file($file_path)){
+                return $file_path;
+            }
+            if(class_exists("\CURLFile")){
+                return new \CURLFile($file_path);
+            }else{
+                return "@".$file_path;
+            }
+        },$file_data);
+        return self::$instance->setUrl($url)->setMethod('POST')->setUpload()->setPostData($file_data)->send();
     }
     private function closeCurl(){
         curl_close($this->ch);
         return $this;
     }
-    public function responseError(){
-        $error = curl_error($this->ch);
-        $errorno = curl_errno($this->ch);
+    private function response(){
+        $response = new Response($this->ch,$this->body);
         $this->closeCurl();
-        return compact('error','errorno');
-    }
-    public function response(){
-        if(empty($this->response)){
-            $this->response = curl_error($this->ch);
-        }
-        $this->closeCurl();
-        return $this->response;
-    }
-    public function getInfo(){
-        $this->response = curl_getinfo($this->ch);
-        return $this;
-    }
-    public function getFollowUrl(){
-        $this->response = curl_getinfo($this->ch, CURLINFO_EFFECTIVE_URL);
-        return $this;
+        return $response;
     }
 }
