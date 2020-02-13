@@ -192,7 +192,7 @@ class HttpClient{
         }
         curl_setopt($this->ch,CURLOPT_URL,$url ? $url : $this->url);
         curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, $method ? strtoupper($method) : $this->method);
-        if($this->method === 'POST' && $this->postData){
+        if(($this->method === 'POST' || strtoupper($method) === 'POST') && $this->postData){
             curl_setopt($this->ch, CURLOPT_POSTFIELDS, $this->postData);
         }
         curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
