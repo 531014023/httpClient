@@ -63,7 +63,7 @@ class HttpClient{
      * @param mixed $upload
      * @return HttpClient
      */
-    public function setUpload($upload)
+    public function setUpload($upload = true)
     {
         $this->upload = $upload;
         return $this;
@@ -183,6 +183,9 @@ class HttpClient{
         return $this;
     }
     /**
+     * @param null $url
+     * @param null $method
+     * @return HttpClient
      * @throws Exception
      */
     public function send($url = null, $method = null){
@@ -194,6 +197,17 @@ class HttpClient{
         curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, $method ? strtoupper($method) : $this->method);
         if(($this->method === 'POST' || strtoupper($method) === 'POST') && $this->postData){
             curl_setopt($this->ch, CURLOPT_POSTFIELDS, $this->postData);
+            if($this->upload){
+                if (class_exists('\CURLFile')) {
+                    //$postData = array('file' => new \CURLFile(realpath($path)));//>=5.5
+                    curl_setopt($this->ch, CURLOPT_SAFE_UPLOAD, true);
+                } else {
+                    //$postData = array('file' => '@' . realpath($path));//<=5.5
+                    if (defined('CURLOPT_SAFE_UPLOAD')) {
+                        curl_setopt($this->ch, CURLOPT_SAFE_UPLOAD, false);
+                    }
+                }
+            }
         }
         curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, $this->follow);

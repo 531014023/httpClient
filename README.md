@@ -24,7 +24,12 @@ HttpClient::instance()->send('https:://www.baidu.com')->responseError();
 HttpClient::instance()->send('https:://www.baidu.com')->getInfo()->response();
 //使用代理
 HttpClient::instance()->setProxy('ip:port')->send('https:://www.baidu.com')->response();
+//上传文件
+HttpClient::instance()->setPostData(array('file'=>new \CURLFile($path)))->setUpload()->send('url','POST)->response();
+HttpClient::instance()->setPostData(array('file'=>'@'.$path))->setUpload()->send('url','POST)->response();
 ```
 ### 使用说明
 curl选项设置要在调用send()方法前
 返回结果的设置在response()方法前
+
+更多用法请参见源码
