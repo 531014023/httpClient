@@ -88,7 +88,7 @@ class HttpClient{
     }
     private function __clone(){}
 
-    public static function instance($force = false){
+    public static function instance($force = true){
         if(empty(self::$instance) || $force){
             self::$instance = new static();
         }
