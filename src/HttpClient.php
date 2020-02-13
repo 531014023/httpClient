@@ -88,7 +88,7 @@ class HttpClient{
     }
     private function __clone(){}
 
-    public static function instance($force = true){
+    public static function instance($force = false){
         if(empty(self::$instance) || $force){
             self::$instance = new static();
         }
@@ -114,13 +114,15 @@ class HttpClient{
             }
             $this->header = array(
                 'Content-Type: application/x-www-form-urlencoded',
-                'Content-Length: ' . strlen($post_str)
+                'Content-Length: ' . strlen($post_str),
+                'X-Requested-With: XMLHttpRequest'
             );
         }else{
             $post_str = json_encode($postData);
             $this->header = array(
                 'Content-Type: application/json',
-                'Content-Length: ' . strlen($post_str)
+                'Content-Length: ' . strlen($post_str),
+                'X-Requested-With: XMLHttpRequest'
             );
         }
         $this->postData = $post_str;
@@ -240,9 +242,10 @@ class HttpClient{
      * @param $url
      * @param array $header
      * @return HttpClient|Response
+     * @throws Exception
      */
     public static function get($url,$header = []){
-        self::$instance = new static();
+        self::$instance = self::instance();
         if($header){
             self::$instance->setHeader($header);
         }
@@ -253,9 +256,10 @@ class HttpClient{
      * @param array $data
      * @param array $header
      * @return HttpClient|Response
+     * @throws Exception
      */
     public static function post($url,$data = [],$header = []){
-        self::$instance = new static();
+        self::$instance = self::instance();
         if($header){
             self::$instance->setHeader($header);
         }
@@ -269,9 +273,10 @@ class HttpClient{
      * @param array $data
      * @param array $header
      * @return HttpClient|Response
+     * @throws Exception
      */
     public static function postJson($url,$data = [],$header = []){
-        self::$instance = new static();
+        self::$instance = self::instance();
         if($header){
             self::$instance->setHeader($header);
         }
@@ -285,9 +290,10 @@ class HttpClient{
      * @param $file_data
      * @param array $header
      * @return HttpClient|Response
+     * @throws Exception
      */
     public static function postFile($url,$file_data,$header = []){
-        self::$instance = new static();
+        self::$instance = self::instance();
         if($header){
             self::$instance->setHeader($header);
         }
@@ -302,6 +308,15 @@ class HttpClient{
             }
         },$file_data);
         return self::$instance->setUrl($url)->setMethod('POST')->setUpload()->setPostData($file_data)->send();
+    }
+    public static function session($path = ''){
+        self::$instance = self::instance();
+        if($path){
+            self::$instance->setCookieFile($path);
+        }else{
+            self::$instance->setCookieFile(tmpfile());
+        }
+        return self::$instance;
     }
     private function closeCurl(){
         curl_close($this->ch);
