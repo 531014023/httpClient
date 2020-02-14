@@ -106,12 +106,7 @@ class HttpClient{
     public function setPostData($postData,$isJson = false){
         $post_str = null;
         if(!$isJson) {
-            if (is_array($postData)) {
-                $post_str = $postData;
-            }
-            if (is_string($postData)) {
-                $post_str = urlencode($postData);
-            }
+            $post_str = $postData;
             $this->setAjax();
         }else{
             $post_str = json_encode($postData);
