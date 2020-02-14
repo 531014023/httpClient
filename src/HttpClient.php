@@ -104,18 +104,15 @@ class HttpClient{
         return $this;
     }
     public function setPostData($postData,$isJson = false){
-        $post_str = '';
+        $post_str = null;
         if(!$isJson) {
             if (is_array($postData)) {
-                $post_str = http_build_query($postData);
+                $post_str = $postData;
             }
             if (is_string($postData)) {
                 $post_str = urlencode($postData);
             }
-            $this->setHeader(array(
-                'Content-Type: application/x-www-form-urlencoded',
-                'Content-Length: ' . strlen($post_str)
-            ));
+            $this->setAjax();
         }else{
             $post_str = json_encode($postData);
             $this->setHeader(array(
@@ -123,7 +120,6 @@ class HttpClient{
                 'Content-Length: ' . strlen($post_str)
             ));
         }
-        $this->setAjax();
         $this->postData = $post_str;
         return $this;
     }
@@ -192,13 +188,13 @@ class HttpClient{
         }else{
             $is_ua = false;
             foreach ($this->header as $k=>$header){
-                if(strpos($header,'Content-Type:') !== false){
-                    $this->header[$k] = 'Content-Type: '.$user_agent;
+                if(strpos($header,'User-Agent:') !== false){
+                    $this->header[$k] = 'User-Agent: '.$user_agent;
                     $is_ua = true;
                 }
             }
             if(!$is_ua){
-                $this->header[] = 'Content-Type: '.$user_agent;
+                $this->header[] = 'User-Agent: '.$user_agent;
             }
         }
         return $this;
@@ -321,6 +317,7 @@ class HttpClient{
             self::$instance->setHeader($header);
         }
         $file_data = array_map(function ($file_path){
+            $file_path = realpath($file_path);
             if(!is_file($file_path)){
                 return $file_path;
             }

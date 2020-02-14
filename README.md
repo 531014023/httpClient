@@ -27,7 +27,7 @@ print_r($response->getHeader());
 //使用代理
 HttpClient::instance()->setProxy('ip:port')->send('https:://www.baidu.com');
 //上传文件
-HttpClient::postFile("http://www.baidu.com",['code'=>1,'file'=>'/usr/local/test.png']);
+HttpClient::postFile("http://www.baidu.com",['code'=>1,'file'=>'/usr/local/test.png']);//可以使用相对路径
 //使用session
 $session = HttpClient::session();
 $response = $session::post("http://www.baidu.com",[
@@ -57,8 +57,8 @@ HttpClient::instance()->send('https:://www.baidu.com')->getHeader();
 //使用代理
 HttpClient::instance()->setProxy('ip:port')->send('https:://www.baidu.com');
 //上传文件
-HttpClient::instance()->setPostData(array('file'=>new \CURLFile($path)))->setUpload()->send('url','POST);
-HttpClient::instance()->setPostData(array('file'=>'@'.$path))->setUpload()->send('url','POST);
+HttpClient::instance()->setPostData(array('file'=>new \CURLFile($path)))->setUpload()->send('url','POST);PHP >5.5
+HttpClient::instance()->setPostData(array('file'=>'@'.$path))->setUpload()->send('url','POST); PHP < 5.5
 ```
 ### 使用说明
 简单版只是内部封装了常用的完整版，如果需要设置代理这类的操作就需要使用完成版调用
