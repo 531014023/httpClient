@@ -65,4 +65,12 @@ HttpClient::instance()->setPostData(array('file'=>'@'.$path))->setUpload()->send
 curl选项设置要在调用send()方法前
 返回结果的设置在response()方法前
 
+内置了快捷设置ua 和content-type方法 setUserAgent() 和 setContentType()方法
+```
+//可选值 web/mobile
+setUserAgent()
+//可选值 form/json/text/html/js/xml
+setContentType()
+```
+
 更多用法请参见源码
