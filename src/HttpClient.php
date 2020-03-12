@@ -131,11 +131,7 @@ class HttpClient{
         return $this;
     }
     public function setHeader($header){
-        if(empty($this->header)) {
-            $this->header = $header;
-        }else{
-            $this->header = array_merge($this->header,$header);
-        }
+        $this->header = $header;
         return $this;
     }
     public function setAjax(){
@@ -232,6 +228,7 @@ class HttpClient{
         curl_setopt($this->ch, CURLOPT_HEADER,$this->showHead);
         if($this->proxy !== null){
             curl_setopt($this->ch, CURLOPT_HTTPPROXYTUNNEL, true);
+            curl_setopt($this->ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
             curl_setopt($this->ch, CURLOPT_PROXYAUTH, $this->proxyAuth); //代理认证模式
             curl_setopt($this->ch, CURLOPT_PROXY, $this->proxy); //代理服务器地址
         }
